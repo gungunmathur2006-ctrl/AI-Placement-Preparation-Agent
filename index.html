@@ -1,0 +1,532 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Placement Preparation Agent - Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div class="brand-text">
+          <h2>Placement Agent</h2>
+          <span class="badge">n8n + Gemini AI</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#overview" class="nav-item active" data-tab="overview">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard Overview</span>
+        </a>
+        <a href="#daily-content" class="nav-item" data-tab="daily-content">
+          <i data-lucide="book-open"></i>
+          <span>Daily Placement Digest</span>
+        </a>
+        <a href="#students" class="nav-item" data-tab="students">
+          <i data-lucide="users"></i>
+          <span>Student Database</span>
+        </a>
+        <a href="#resume-ats" class="nav-item" data-tab="resume-ats">
+          <i data-lucide="file-check-2"></i>
+          <span>Resume ATS Feedback</span>
+        </a>
+        <a href="#n8n-workflows" class="nav-item" data-tab="n8n-workflows">
+          <i data-lucide="workflow"></i>
+          <span>n8n Architecture</span>
+        </a>
+      </nav>
+
+      <div class="system-status">
+        <div class="status-header">
+          <span class="pulse-dot green"></span>
+          <span>Engine Status</span>
+        </div>
+        <div class="status-details">
+          <div class="status-row">
+            <span>n8n Core:</span>
+            <strong id="n8n-status">Connected (:5678)</strong>
+          </div>
+          <div class="status-row">
+            <span>Gemini API:</span>
+            <strong class="text-glow">Active (v1.5 Flash)</strong>
+          </div>
+          <div class="status-row">
+            <span>Google Sheets:</span>
+            <strong>PlacementAgent</strong>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar Header -->
+      <header class="topbar">
+        <div class="header-title">
+          <h1>AI Placement Preparation Agent</h1>
+          <p>Automated Daily Aptitude, Coding, Interview Coaching & Resume ATS Feedback</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="btn-trigger-n8n">
+            <i data-lucide="play-circle"></i>
+            <span>Run n8n Workflow</span>
+          </button>
+          <button class="btn btn-primary" id="btn-add-student">
+            <i data-lucide="user-plus"></i>
+            <span>Add Student</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-page active">
+        <!-- 5 Key Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card gradient-border">
+            <div class="metric-icon blue">
+              <i data-lucide="users"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Total Students</span>
+              <h3 class="metric-value" id="val-students-count">128</h3>
+              <span class="metric-sub text-green">↑ Active cohort</span>
+            </div>
+          </div>
+
+          <div class="metric-card gradient-border">
+            <div class="metric-icon purple">
+              <i data-lucide="brain-circuit"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Daily Questions</span>
+              <h3 class="metric-value" id="val-questions-count">2,560</h3>
+              <span class="metric-sub text-purple">Aptitude & Coding</span>
+            </div>
+          </div>
+
+          <div class="metric-card gradient-border">
+            <div class="metric-icon green">
+              <i data-lucide="mail-check"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Emails Sent</span>
+              <h3 class="metric-value" id="val-emails-count">1,240</h3>
+              <span class="metric-sub text-green">Gmail Automation</span>
+            </div>
+          </div>
+
+          <div class="metric-card gradient-border">
+            <div class="metric-icon orange">
+              <i data-lucide="file-text"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Resume Reviews</span>
+              <h3 class="metric-value" id="val-resumes-count">94</h3>
+              <span class="metric-sub text-orange">PDF Processed</span>
+            </div>
+          </div>
+
+          <div class="metric-card gradient-border">
+            <div class="metric-icon cyan">
+              <i data-lucide="award"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Average ATS Score</span>
+              <h3 class="metric-value" id="val-avg-ats">82.4 <small>/100</small></h3>
+              <span class="metric-sub text-cyan">Gemini Evaluated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Daily Content Preview Sections -->
+        <div class="content-preview-header">
+          <h2>Today's Generated Placement Content</h2>
+          <span class="timestamp" id="live-date">2026-08-08 | 9:00 AM Trigger</span>
+        </div>
+
+        <div class="daily-cards-grid">
+          <!-- Aptitude Card -->
+          <div class="content-card glass-panel">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="calculator" class="icon-aptitude"></i>
+                <h3>Today's Aptitude</h3>
+              </div>
+              <span class="tag tag-blue">Quantitative</span>
+            </div>
+            <div class="card-body" id="card-aptitude">
+              <p class="question-text"><strong>Question:</strong> A train running at the speed of 60 km/hr crosses a pole in 9 seconds. What is the length of the train?</p>
+              <div class="answer-box">
+                <strong>Answer:</strong> 150 meters (Speed = 60 * 5/18 m/s = 50/3 m/s. Distance = 50/3 * 9 = 150m)
+              </div>
+            </div>
+          </div>
+
+          <!-- Coding Card -->
+          <div class="content-card glass-panel">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="code-2" class="icon-coding"></i>
+                <h3>Today's Coding</h3>
+              </div>
+              <span class="tag tag-purple">Basic Logic</span>
+            </div>
+            <div class="card-body" id="card-coding">
+              <p class="question-text"><strong>Problem:</strong> Write a function to check if a string is a palindrome.</p>
+              <pre class="code-snippet"><code>Input: "racecar"
+Output: true
+Explanation: String reads the same forwards and backwards.</code></pre>
+            </div>
+          </div>
+
+          <!-- Interview Tip Card -->
+          <div class="content-card glass-panel">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="user-check" class="icon-tip"></i>
+                <h3>Interview Tip</h3>
+              </div>
+              <span class="tag tag-green">Soft Skills</span>
+            </div>
+            <div class="card-body" id="card-tip">
+              <blockquote class="tip-quote">
+                "Always structure your answers using the STAR method (Situation, Task, Action, Result) during technical and behavioral interview rounds."
+              </blockquote>
+            </div>
+          </div>
+
+          <!-- Motivational Quote Card -->
+          <div class="content-card glass-panel">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="quote" class="icon-quote"></i>
+                <h3>Motivational Quote</h3>
+              </div>
+              <span class="tag tag-orange">Mindset</span>
+            </div>
+            <div class="card-body" id="card-quote">
+              <blockquote class="quote-text">
+                "Success is where preparation and opportunity meet. Keep grinding every day!"
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DAILY PLACEMENT DIGEST -->
+      <section id="tab-daily-content" class="tab-page">
+        <div class="section-title">
+          <h2>Daily Placement Preparation Preview</h2>
+          <p>This is the exact email digest format delivered to each student via Gmail daily at 9:00 AM.</p>
+        </div>
+
+        <div class="email-preview-container glass-panel">
+          <div class="email-header">
+            <div class="email-field"><span>To:</span> <strong id="preview-email">gungun.student@example.com</strong></div>
+            <div class="email-field"><span>Subject:</span> <strong id="preview-subject">Today's Placement Preparation - Gun Gun</strong></div>
+            <div class="email-field"><span>From:</span> <span>AI Placement Preparation Agent &lt;noreply@placementagent.ai&gt;</span></div>
+          </div>
+          <div class="email-body" id="email-preview-content">
+            <p>Hello <strong>Gun Gun</strong>,</p>
+            <p>Here is your placement preparation for today.</p>
+            
+            <div class="digest-block">
+              <h4>========================<br>APTITUDE<br>========================</h4>
+              <p id="digest-aptitude">Question: Find the average of the first 5 consecutive odd numbers.<br>Answer: 5</p>
+            </div>
+
+            <div class="digest-block">
+              <h4>========================<br>CODING<br>========================</h4>
+              <p id="digest-coding">Problem: Write a program to reverse an array in-place.<br>Output: [1, 2, 3] -> [3, 2, 1]<br>Explanation: Swap elements starting from ends towards middle.</p>
+            </div>
+
+            <div class="digest-block">
+              <h4>========================<br>INTERVIEW TIP<br>========================</h4>
+              <p id="digest-tip">Research the company's recent engineering blogs and tech stack before your technical interview.</p>
+            </div>
+
+            <div class="digest-block">
+              <h4>========================<br>MOTIVATIONAL QUOTE<br>========================</h4>
+              <p id="digest-quote">"Hard work beats talent when talent doesn't work hard."</p>
+            </div>
+
+            <p>Keep preparing consistently.</p>
+            <p>Best Wishes,<br><strong>AI Placement Preparation Agent</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: STUDENT DATABASE -->
+      <section id="tab-students" class="tab-page">
+        <div class="section-header">
+          <div>
+            <h2>Google Sheets Student Database</h2>
+            <p>Live synchronized view of the <code>PlacementAgent</code> worksheet.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-students">
+            <i data-lucide="refresh-cw"></i> Refresh Data
+          </button>
+        </div>
+
+        <div class="table-container glass-panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Date</th>
+                <th>Aptitude Question</th>
+                <th>Coding Problem</th>
+                <th>Interview Tip</th>
+                <th>Motivational Quote</th>
+                <th>Resume Status</th>
+                <th>ATS Score</th>
+              </tr>
+            </thead>
+            <tbody id="student-table-body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: RESUME ATS FEEDBACK -->
+      <section id="tab-resume-ats" class="tab-page">
+        <div class="section-title">
+          <h2>Resume Feedback & ATS Evaluator</h2>
+          <p>Upload a student resume to generate AI-driven skill extraction, flaw analysis, and ATS scoring.</p>
+        </div>
+
+        <div class="resume-grid">
+          <div class="resume-upload-card glass-panel">
+            <h3>Upload Student Resume</h3>
+            <form id="resume-form">
+              <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="res-student-name" placeholder="e.g. Gun Gun" required value="Gun Gun">
+              </div>
+              <div class="form-group">
+                <label>Student Email</label>
+                <input type="email" id="res-student-email" placeholder="student@example.com" required value="gungun.student@example.com">
+              </div>
+              <div class="form-group">
+                <label>Paste Resume Text (or Upload PDF)</label>
+                <textarea id="res-resume-text" rows="10" placeholder="Paste full resume text here..." required>Gun Gun - Computer Science Undergraduate
+Skills: Python, JavaScript, HTML/CSS, SQL, Git, Data Structures, Algorithms.
+Projects: E-commerce Web Application, AI Chatbot using Gemini API.
+Experience: Software Development Intern at Tech Solutions (3 months).
+Education: B.Tech in Computer Science and Engineering (CGPA: 8.5/10).
+Certifications: Google Cloud Digital Leader, Hackathon Winner 2025.</textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block" id="btn-analyze-resume">
+                <i data-lucide="sparkles"></i>
+                <span>Analyze Resume with Gemini AI</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="resume-result-card glass-panel">
+            <h3>ATS Analysis Result</h3>
+            <div id="resume-output-placeholder" class="placeholder-state">
+              <i data-lucide="file-search" class="large-icon"></i>
+              <p>Submit resume text on the left to see instant Gemini ATS breakdown.</p>
+            </div>
+
+            <div id="resume-output-content" class="output-content hidden">
+              <div class="score-banner">
+                <div class="score-circle">
+                  <span id="output-ats-score">88</span>
+                  <small>/100</small>
+                </div>
+                <div class="score-text">
+                  <h4 id="output-ats-grade">Strong Candidate Match</h4>
+                  <p id="output-ats-summary">Resume formatted well for ATS parsers with clear technical keywords.</p>
+                </div>
+              </div>
+
+              <div class="analysis-section">
+                <h4><i data-lucide="check-circle-2" class="text-green"></i> Key Skills Extracted</h4>
+                <ul id="output-skills" class="skills-list"></ul>
+              </div>
+
+              <div class="analysis-section">
+                <h4><i data-lucide="alert-triangle" class="text-orange"></i> Areas to Improve</h4>
+                <ul id="output-weaknesses" class="bullet-list"></ul>
+              </div>
+
+              <div class="analysis-section">
+                <h4><i data-lucide="lightbulb" class="text-blue"></i> Actionable Suggestions</h4>
+                <ul id="output-suggestions" class="bullet-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: N8N ARCHITECTURE -->
+      <section id="tab-n8n-workflows" class="tab-page">
+        <div class="section-title">
+          <h2>n8n Workflow Engine Architecture</h2>
+          <p>Explore the exact node configurations powering the background automation engine.</p>
+        </div>
+
+        <div class="workflow-cards-container">
+          <div class="workflow-box glass-panel">
+            <div class="wf-header">
+              <i data-lucide="workflow" class="text-purple"></i>
+              <div>
+                <h3>Daily Placement Agent Workflow</h3>
+                <code class="file-path">workflows/daily-placement-agent.json</code>
+              </div>
+            </div>
+            <ol class="node-pipeline">
+              <li>
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Schedule Trigger</strong>
+                  <div class="step-desc">Cron Schedule: <code>0 9 * * *</code></div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Google Sheets Read Rows</strong>
+                  <div class="step-desc">Reads from <code>PlacementAgent</code></div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Loop Over Items</strong>
+                  <div class="step-desc">Batch size: 1 (Process each student)</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Gemini API Calls</strong>
+                  <div class="step-desc">Parallel requests for Aptitude, Coding, Tip, Quote</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div class="step-content">
+                  <strong>Merge Code Node</strong>
+                  <div class="step-desc">Consolidates dynamic JSON object</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">6</span>
+                <div class="step-content">
+                  <strong>Google Sheets Update Node</strong>
+                  <div class="step-desc">Updates row by matching Email</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">7</span>
+                <div class="step-content">
+                  <strong>Gmail Send Node</strong>
+                  <div class="step-desc">Sends structured daily digest email</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="workflow-box glass-panel">
+            <div class="wf-header">
+              <i data-lucide="file-text" class="text-blue"></i>
+              <div>
+                <h3>Resume Feedback Agent Workflow</h3>
+                <code class="file-path">workflows/resume-feedback-agent.json</code>
+              </div>
+            </div>
+            <ol class="node-pipeline">
+              <li>
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Webhook / Manual Trigger</strong>
+                  <div class="step-desc">Endpoint: <code>/webhook/analyze-resume</code></div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Extract Resume Text</strong>
+                  <div class="step-desc">Binary PDF to Plaintext extraction</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Gemini API Analysis</strong>
+                  <div class="step-desc">Skills, Flaws, Suggestions & ATS Score</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Parse Feedback Code Node</strong>
+                  <div class="step-desc">Regex score extraction out of 100</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div class="step-content">
+                  <strong>Google Sheets Update Node</strong>
+                  <div class="step-desc">Sets Status to <code>Reviewed</code> & ATS Score</div>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">6</span>
+                <div class="step-content">
+                  <strong>Gmail Send Node</strong>
+                  <div class="step-desc">Emails comprehensive PDF critique report</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add Student Modal -->
+  <div class="modal-overlay hidden" id="modal-add-student">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3>Add New Student to Database</h3>
+        <button class="close-btn" id="btn-close-modal">&times;</button>
+      </div>
+      <form id="add-student-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="modal-name" required placeholder="e.g. Rahul Sharma">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="modal-email" required placeholder="rahul@example.com">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to Sheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

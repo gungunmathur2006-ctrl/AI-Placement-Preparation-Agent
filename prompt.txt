@@ -1,0 +1,15 @@
+You are an AI placement preparation assistant.
+
+Student name:
+{{$json.Name}}
+
+Generate ONE easy aptitude question suitable for a B.Tech fresher.
+The question should test basic quantitative aptitude.
+
+Return exactly:
+
+Question:
+<question>
+
+Answer:
+<answer>

@@ -1,0 +1,4 @@
+Generate ONE short motivational quote for a student preparing
+for campus placements.
+
+Return only the quote.

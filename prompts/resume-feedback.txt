@@ -1,0 +1,28 @@
+Analyze the following resume for a student applying for campus placement opportunities.
+
+Student Name: {{$json.Name}}
+
+Resume Content:
+{{$json.resumeText}}
+
+Provide:
+
+1. Skills: Extract core technical & soft skills
+2. Weaknesses: Highlight missing sections, formatting flaws, or weak projects
+3. Suggestions: Actionable bullet points to improve the resume
+4. ATS Score out of 100
+
+Give practical and concise feedback.
+
+Return structured output:
+
+Skills:
+- <skills>
+
+Weaknesses:
+- <weaknesses>
+
+Suggestions:
+- <suggestions>
+
+ATS Score: <score>/100

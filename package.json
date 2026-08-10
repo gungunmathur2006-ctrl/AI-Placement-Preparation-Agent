@@ -1,0 +1,20 @@
+﻿{
+  "name": "ai-placement-preparation-agent",
+  "version": "1.0.0",
+  "description": "AI Placement Preparation Agent using n8n, Gemini API, Google Sheets, Gmail & Docker",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx n8n start",
+    "n8n": "npx n8n start",
+    "dashboard": "npx -y serve -l 3000 ."
+  },
+  "keywords": [
+    "n8n",
+    "gemini-api",
+    "placement-agent",
+    "workflow-automation",
+    "ai-placement"
+  ],
+  "author": "Gun Gun",
+  "license": "MIT"
+}

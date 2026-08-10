@@ -1,0 +1,142 @@
+{
+  "name": "Daily Placement Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "node-schedule-trigger",
+      "name": "Schedule Trigger (9 AM Daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {},
+      "id": "node-manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 480]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.GOOGLE_SHEET_ID || 'PlacementAgent_Sheet_ID'}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "PlacementAgent",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "node-google-sheets-read",
+      "name": "Google Sheets - Read Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [480, 390]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "node-loop-students",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [700, 390]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"You are an AI placement preparation assistant.\\n\\nStudent name:\\n{{$json.Name}}\\n\\nGenerate ONE easy aptitude question suitable for a B.Tech fresher.\\n\\nQuestion:\\n<question>\\n\\nAnswer:\\n<answer>\"\n    }]\n  }]\n}"
+      },
+      "id": "node-gemini-aptitude",
+      "name": "HTTP Request - Aptitude",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"You are an AI placement preparation assistant.\\n\\nStudent:\\n{{$json.Name}}\\n\\nGenerate ONE easy coding problem suitable for a B.Tech fresher.\\n\\nProblem:\\n<Input>\\n\\nOutput:\\n<Expected output>\\n\\nExplanation:\\n<Short explanation>\"\n    }]\n  }]\n}"
+      },
+      "id": "node-gemini-coding",
+      "name": "HTTP Request - Coding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Give ONE practical interview tip for a fresher preparing for campus placements.\"\n    }]\n  }]\n}"
+      },
+      "id": "node-gemini-interview",
+      "name": "HTTP Request - Interview Tip",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "return { json: { Name: $json.Name, Email: $json.Email, Date: new Date().toISOString().split('T')[0] } };"
+      },
+      "id": "node-merge-results",
+      "name": "Merge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 500]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetName": "PlacementAgent",
+        "columnToMatchOn": "Email",
+        "valueToMatchOn": "={{$json.Email}}"
+      },
+      "id": "node-google-sheets-update",
+      "name": "Google Sheets - Update Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1460, 500]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json.Email}}",
+        "subject": "=Today's Placement Preparation - {{$json.Name}}",
+        "message": "=Hello {{$json.Name}},\n\nHere is your placement preparation for today."
+      },
+      "id": "node-gmail-send",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1700, 500]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": { "main": [[{ "node": "Google Sheets - Read Rows", "type": "main", "index": 0 }]] },
+    "Google Sheets - Read Rows": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] },
+    "Loop Over Items": { "main": [[{ "node": "HTTP Request - Aptitude", "type": "main", "index": 0 }, { "node": "HTTP Request - Coding", "type": "main", "index": 0 }, { "node": "HTTP Request - Interview Tip", "type": "main", "index": 0 }]] },
+    "HTTP Request - Aptitude": { "main": [[{ "node": "Merge", "type": "main", "index": 0 }]] },
+    "HTTP Request - Coding": { "main": [[{ "node": "Merge", "type": "main", "index": 0 }]] },
+    "HTTP Request - Interview Tip": { "main": [[{ "node": "Merge", "type": "main", "index": 0 }]] },
+    "Merge": { "main": [[{ "node": "Google Sheets - Update Row", "type": "main", "index": 0 }]] },
+    "Google Sheets - Update Row": { "main": [[{ "node": "Gmail", "type": "main", "index": 0 }]] }
+  }
+}
